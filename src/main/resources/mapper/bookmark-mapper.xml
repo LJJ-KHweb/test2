@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.allergyout.bookmark.model.dao.BookmarkMapper">
+
+    <!-- 해당 회원이 그 레시피를 이미 즐겨찾기했는지 (복합 PK 존재 여부) -->
+    <select id="isDuplicateBookmark" resultType="boolean">
+        SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+          FROM BOOKMARK
+         WHERE MEMBER_NO = #{memberNo}
+           AND RECIPE_NO = #{recipeNo}
+    </select>
+
+    <!-- CREATE_DATE 는 DB default(SYSDATE) → INSERT 컬럼에 안 넣음 -->
+    <insert id="insertBookmark">
+        INSERT INTO BOOKMARK (MEMBER_NO, RECIPE_NO)
+        VALUES (#{memberNo}, #{recipeNo})
+    </insert>
+
+    <!-- 내 즐겨찾기 목록 — 북마크한 날짜(BOOKMARK.CREATE_DATE) 최신순, OFFSET 페이징.
+         삭제된 레시피(RECIPES.DEL_YN='Y')는 제외. RECIPE_MAIN_IMG = 원본 파일명 /
+         RECIPES_IMG_PATH = S3 버킷 URL(프론트 썸네일). CREATE_DATE = 레시피 작성일.
+         프로젝션·컬럼순서는 recipe-mapper 의 getRecipeList / getMyRecipeList 와 동일 (프론트 RecipeCard 공용).
+         즐겨찾기 목록이므로 IS_BOOKMARKED 는 1 고정. -->
+    <select id="getBookmarkList" resultType="BookmarkListItem">
+        SELECT r.RECIPE_NO
+             , r.RECIPE_TITLE
+             , r.RECIPE_MAIN_IMG
+             , r.RECIPES_IMG_PATH
+             , m.MEMBER_NAME
+             , r.CREATE_DATE
+             , r.RECIPE_TYPE
+             , r.COOKING_METHOD
+             , r.CALORIE
+             , r.MAIN_MATERIAL
+             , r.VIEW_COUNT
+             , 1 AS IS_BOOKMARKED
+          FROM BOOKMARK b
+          JOIN RECIPES  r ON b.RECIPE_NO = r.RECIPE_NO
+          JOIN MEMBER   m ON r.MEMBER_NO = m.MEMBER_NO
+         WHERE b.MEMBER_NO = #{memberNo}
+           AND r.DEL_YN = 'N'
+         ORDER BY b.CREATE_DATE DESC, b.RECIPE_NO DESC
+        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+    </select>
+
+    <select id="countBookmarkList" resultType="int">
+        SELECT COUNT(*)
+          FROM BOOKMARK b
+          JOIN RECIPES  r ON b.RECIPE_NO = r.RECIPE_NO
+         WHERE b.MEMBER_NO = #{memberNo}
+           AND r.DEL_YN = 'N'
+    </select>
+
+    <!-- 내 즐겨찾기 1건 삭제 (복합 PK). MEMBER_NO 를 WHERE 에 걸어 남의 북마크는 스코프 밖.
+         삭제된 레시피의 북마크도 정리 가능해야 하므로 RECIPES 조인/DEL_YN 검사 안 함. -->
+    <delete id="deleteBookmark">
+        DELETE FROM BOOKMARK
+         WHERE MEMBER_NO = #{memberNo}
+           AND RECIPE_NO = #{recipeNo}
+    </delete>
+
+</mapper>
