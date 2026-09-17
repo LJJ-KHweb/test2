@@ -1,6 +1,20 @@
 # Allergy Out Backend
 
 **나의 알레르기와 목표 칼로리를 고려한 레시피 탐색 서비스**
+<br/>
+
+![Java](https://img.shields.io/badge/Java-21-007396?style=flat-square&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5-6DB33F?style=flat-square&logo=springboot&logoColor=white)
+![Spring Security](https://img.shields.io/badge/Spring_Security-JWT-6DB33F?style=flat-square&logo=springsecurity&logoColor=white)
+![MyBatis](https://img.shields.io/badge/MyBatis-3.0-000000?style=flat-square)
+![Oracle](https://img.shields.io/badge/Oracle-21-F80000?style=flat-square&logo=oracle&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?style=flat-square&logo=vite&logoColor=white)
+![Kakao Map](https://img.shields.io/badge/Kakao_Map-API-FFCD00?style=flat-square&logo=kakao&logoColor=black)
+
+</div>
+
+<br/>
 
 ## 프로젝트 소개
 
